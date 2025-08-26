@@ -1,0 +1,245 @@
+name: shared/CFANet_shared_para_4_aes
+# name: debug_model
+model_type: LocalSharedIQAModel 
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 123
+
+define: &batch_size_per_gpu 16
+define: &setting 2
+define: &num_class 4
+define: &img_size_oneside 384 
+define: &img_size [*img_size_oneside, *img_size_oneside]
+
+define: &backbone resnet50
+define: &pretrained_model_path ~
+
+# dataset and data loader settings
+datasets:
+
+  train_global_1:
+    name: PARA_color
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_train.csv
+    label_type: colorScore
+
+    augment:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size 
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_2:
+    name: PARA_composition
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_train.csv
+    label_type: compositionScore
+
+    augment:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size 
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_3:
+    name: PARA_content
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_train.csv
+    label_type: contentScore
+
+    augment:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size 
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_4:
+    name: PARA_light
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_train.csv
+    label_type: lightScore
+
+    augment:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size 
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val_1:
+    name: PARA_val_color
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_test.csv
+    label_type: colorScore
+    augment:
+      resize: *img_size_oneside
+      center_crop: *img_size
+
+  val_2:
+    name: PARA_val_composition
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_test.csv
+    label_type: compositionScore
+    augment:
+      resize: *img_size_oneside
+      center_crop: *img_size
+
+  val_3:
+    name: PARA_val_content
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_test.csv
+    label_type: contentScore
+    augment:
+      resize: *img_size_oneside
+      center_crop: *img_size
+
+  val_4:
+    name: PARA_val_light
+    type: PARA
+    dataroot: ./datasets/PARA
+    meta_info_file: ./datasets/PARA/annotation/meta_info_PARA_Dataset_test.csv
+    label_type: lightScore
+    augment:
+      resize: *img_size_oneside
+      center_crop: *img_size
+
+dataset_head_idx_mapping:
+  PARA_color: 0
+  PARA_composition: 1
+  PARA_content: 2
+  PARA_light: 3
+  PARA_val_color: 0
+  PARA_val_composition: 1
+  PARA_val_content: 2
+  PARA_val_light: 3
+
+# network structures
+network:
+  type: CFANet_Shared
+  setting: *setting
+  num_class: *num_class
+  num_crop: 1 
+  crop_size: *img_size
+  semantic_model_name: *backbone
+  pretrained_model_path: *pretrained_model_path
+  pretrained: false
+
+# path
+path:
+  strict_load_g: true
+  resume_state: ~
+  pretrain_network: ~
+
+network_base:
+  base1:
+    metric:
+      type: PSNR
+    lower_better: true
+    datasets:
+      d1: none
+
+# training settings
+train:
+  optim:
+    type: AdamW
+    lr: !!float 3e-5 
+    weight_decay: !!float 1e-5
+  
+  scheduler:
+    type: CosineAnnealingLR
+    T_max: 50 
+    eta_min: 0 
+    # type: StepLR 
+    # step_size: !!float 1e9
+    # gamma: 1.0 
+
+  total_iter: 10000
+  train_backbone_iter: 5000
+  total_epoch: ~
+  warmup_iter: -1  # no warm up
+  
+  # losses
+  losses:
+    loss1:
+      datasets:
+        d1: PARA_color
+        d2: PARA_composition
+        d3: PARA_content
+        d4: PARA_light
+      opt:
+        type: NiNLoss
+        loss_weight: !!float 1.0
+
+    loss2:
+      datasets:
+        d1: PARA_color
+        d2: PARA_composition
+        d3: PARA_content
+        d4: PARA_light
+      opt:
+        type: MSELoss
+        loss_weight: !!float 1.0
+
+# validation settings
+val:
+  val_freq: !!float 500
+  save_img: false
+  pbar: true
+
+  key_metric: srcc # if this metric improve, update all metrics. If not specified, each best metric results will be updated separately 
+  metrics:
+    srcc: 
+      type: calculate_srcc
+
+    plcc: 
+      type: calculate_plcc
+
+# logging settings
+logger:
+  print_freq: 100
+  save_latest_freq: !!float 500000
+  log_imgs_freq: 1000
+  use_tb_logger: false
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
+
+find_unused_parameters: True

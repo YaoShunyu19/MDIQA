@@ -1,0 +1,280 @@
+name: shared/CFANet_shared_spaq_5_tech
+# name: debug_model
+model_type: LocalSharedIQAModel 
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 123
+
+define: &batch_size_per_gpu 16
+define: &setting 2
+define: &num_class 5
+define: &img_size_oneside 384 
+define: &img_size [*img_size_oneside, *img_size_oneside]
+
+define: &backbone resnet50
+define: &pretrained_model_path ~
+
+# dataset and data loader settings
+datasets:
+
+  train_global_1:
+    name: SPAQ_brightness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_train.csv
+    label_type: brightness
+
+    augment:
+      hflip: true
+      random_crop: *img_size_oneside
+    augment_aes:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_2:
+    name: SPAQ_colorfulness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_train.csv
+    label_type: colorfulness
+
+    augment:
+      hflip: true
+      random_crop: *img_size_oneside
+    augment_aes:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_3:
+    name: SPAQ_contrast
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_train.csv
+    label_type: contrast
+
+    augment:
+      hflip: true
+      random_crop: *img_size_oneside
+    augment_aes:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_4:
+    name: SPAQ_noise
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_train.csv
+    label_type: noisiness
+
+    augment:
+      hflip: true
+      random_crop: *img_size_oneside
+    augment_aes:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  train_global_5:
+    name: SPAQ_sharpness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_train.csv
+    label_type: sharpness
+
+    augment:
+      hflip: true
+      random_crop: *img_size_oneside
+    augment_aes:
+      hflip: true
+      resize: *img_size_oneside
+      random_crop: *img_size
+    img_range: 1
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: *batch_size_per_gpu
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val_1:
+    name: SPAQ_val_brightness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_test.csv
+    label_type: brightness
+
+  val_2:
+    name: SPAQ_val_colorfulness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_test.csv
+    label_type: colorfulness
+
+  val_3:
+    name: SPAQ_val_contrast
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_test.csv
+    label_type: contrast
+
+  val_4:
+    name: SPAQ_val_noise
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_test.csv
+    label_type: noisiness
+
+  val_5:
+    name: SPAQ_val_sharpness
+    type: SPAQ
+    dataroot: ./datasets/SPAQ
+    meta_info_file: ./datasets/SPAQ/Annotations/meta_info_SPAQ512_Dataset_test.csv
+    label_type: sharpness
+
+
+dataset_head_idx_mapping:
+  SPAQ_brightness: 0
+  SPAQ_colorfulness: 1
+  SPAQ_contrast: 2
+  SPAQ_noise: 3
+  SPAQ_sharpness: 4
+  SPAQ_val_brightness: 0
+  SPAQ_val_colorfulness: 1
+  SPAQ_val_contrast: 2
+  SPAQ_val_noise: 3
+  SPAQ_val_sharpness: 4
+
+# network structures
+network:
+  type: CFANet_Shared
+  setting: *setting
+  num_class: *num_class
+  num_crop: 1 
+  crop_size: *img_size
+  semantic_model_name: *backbone
+  pretrained_model_path: *pretrained_model_path
+  pretrained: false
+
+# path
+path:
+  strict_load_g: true
+  resume_state: ~
+  pretrain_network: ~
+
+network_base:
+  base1:
+    metric:
+      type: PSNR
+    lower_better: true
+    datasets:
+      d1: none
+
+# training settings
+train:
+  optim:
+    type: AdamW
+    lr: !!float 3e-5 
+    weight_decay: !!float 1e-5
+  
+  scheduler:
+    type: CosineAnnealingLR
+    T_max: 50 
+    eta_min: 0 
+    # type: StepLR 
+    # step_size: !!float 1e9
+    # gamma: 1.0 
+
+  total_iter: 10000
+  train_backbone_iter: 1500
+  total_epoch: ~
+  warmup_iter: -1  # no warm up
+  
+  # losses
+  losses:
+    loss1:
+      datasets:
+        d1: SPAQ_brightness
+        d2: SPAQ_colorfulness
+        d3: SPAQ_contrast
+        d4: SPAQ_noise
+        d5: SPAQ_sharpness
+      opt:
+        type: NiNLoss
+        loss_weight: !!float 1.0
+
+    loss2:
+      datasets:
+        d1: SPAQ_brightness
+        d2: SPAQ_colorfulness
+        d3: SPAQ_contrast
+        d4: SPAQ_noise
+        d5: SPAQ_sharpness
+      opt:
+        type: MSELoss
+        loss_weight: !!float 1.0
+
+# validation settings
+val:
+  val_freq: !!float 500
+  save_img: false
+  pbar: true
+
+  key_metric: srcc # if this metric improve, update all metrics. If not specified, each best metric results will be updated separately 
+  metrics:
+    srcc: 
+      type: calculate_srcc
+
+    plcc: 
+      type: calculate_plcc
+
+# logging settings
+logger:
+  print_freq: 100
+  save_latest_freq: !!float 500000
+  log_imgs_freq: 1000
+  use_tb_logger: false
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
+
+find_unused_parameters: True
