@@ -48,6 +48,8 @@ train cross dataset:
 python MDIQA/train_MDIQA.py -opt MDIQA/options_MDIQA/benchmark_experiments/train_MDIQA_xd_koniq.yml
 ```
 
+To use MDIQA for restoration, please refer to [BasicSR](https://github.com/XPixelGroup/BasicSR) and MDIQA/BasicSR/options/train/RealESRGAN/finetune_realesrgan_x4plus.yml.
+
 
 ## ✨ Datasets
 
@@ -71,4 +73,4 @@ You can download the datasets [here](https://huggingface.co/datasets/chaofengc/I
 
 ## 💞 Acknowledgements
 
-Thanks for the work of [IQA-PyTorch](https://github.com/chaofengc/IQA-PyTorch). Our code is based on the implementation of them.
+Thanks for the work of [IQA-PyTorch](https://github.com/chaofengc/IQA-PyTorch) and [BasicSR](https://github.com/XPixelGroup/BasicSR). Our code is based on the implementation of them.
