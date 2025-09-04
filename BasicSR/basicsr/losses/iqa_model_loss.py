@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 from PIL import Image
 from basicsr.losses.topiq_base_shared_arch import CFANet_Shared
-from basicsr.losses.topiq_base_unshared_arch import LocalScoreModule_v4, InstanceSpecificWeightedBranchv2
+from basicsr.losses.topiq_base_unshared_arch import LocalScoreModule_v4, InstanceSpecificWeightedBranch
 import open_clip
 from torchvision import transforms
 import math
@@ -57,7 +57,11 @@ class MultiDimFusionWeightedMLP(nn.Module):
 
         self.instance_specific_weighted = instance_specific_weighted
         if self.instance_specific_weighted is not False:
-            self.instance_specific_weighted_branch = InstanceSpecificWeightedBranchv2(num_class=num_dim)
+            self.instance_specific_weighted_branch = InstanceSpecificWeightedBranch(semantic_model_name=semantic_model_name,
+                                                                                    use_ref=False,
+                                                                                    quality_map=False,
+                                                                                    num_class=num_dim,
+                                                                                    out_act=out_act)
 
         self.semantic_feat = semantic_feat
         if 'clip' in self.semantic_feat:
