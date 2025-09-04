@@ -165,8 +165,8 @@ class MultiDimSharedIQAModel(nn.Module):
                                                              dataset_specific_weighted=False,
                                                              instance_specific_weighted=True,
                                                              semantic_model_name=weight_model_name,
-                                                             local_score='v4',  # false v4
-                                                             semantic_feat='clip_RN50',  # without clip_RN50
+                                                             local_score=False,  # false v4
+                                                             semantic_feat='without',  # without clip_RN50
                                                              out_act='softmax',
                                                              mask_feat=False)
 
