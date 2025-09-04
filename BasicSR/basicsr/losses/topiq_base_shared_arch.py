@@ -23,7 +23,6 @@ import copy
 from .clip_model import load
 from .topiq_swin import create_swin
 
-from facexlib.utils.face_restoration_helper import FaceRestoreHelper
 import os
 import warnings
 
